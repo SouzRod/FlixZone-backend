@@ -5,7 +5,7 @@ function getRandomInt(min, max) {
 }
 
 const get = async (req, res) => {
-	const page = getRandomInt(1, 500);
+	const page = getRandomInt(1, 100);
 	const response = await getMovies(page, 'pt-BR');
 
 	const movieNumber = getRandomInt(1, response.length);

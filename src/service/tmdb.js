@@ -9,7 +9,14 @@ const instance = axios.create({
 
 const getMovies = async (page, language) => {
 	try {
-		const { data: { results } } = await instance.get(`/3/discover/movie?api_key=${apiKey}&language=${language}&page=${page}`);
+		const params = {
+			api_key: apiKey,
+			language,
+			page,
+			'release_date.gte': '2018',
+			without_genres: 27
+		};
+		const { data: { results } } = await instance.get(`/3/discover/movie`, { params });
 		return results;
 	} catch (e) {
 		throw e;
