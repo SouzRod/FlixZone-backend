@@ -11,13 +11,13 @@ const get = async (req, res) => {
 	const movieNumber = getRandomInt(1, response.length);
 
 	const {
-		backdrop_path,
+		poster_path,
 		title,
 		overview
 	} = response[movieNumber];
 
 	return res.json({
-		backdrop_path: `https://image.tmdb.org/t/p/w500${backdrop_path}`,
+		backdrop_path: `https://image.tmdb.org/t/p/w500${poster_path}`,
 		title,
 		overview
 	}).status(200);
