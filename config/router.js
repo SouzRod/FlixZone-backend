@@ -3,6 +3,6 @@ const movieController = require('../src/controller/movie');
 
 const router = Router();
 
-router.get('/random-movies', movieController.get);
+router.get('/', movieController.get);
 
 module.exports = router;
