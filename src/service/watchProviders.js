@@ -26,7 +26,7 @@ const getWatchProviders = async (movieId, language = 'pt-BR') => {
     };
     const uniqueProviders = [];
     for (const provider of providers) {
-      if (provider.provider_name.includes('Channel')) continue;
+      if (provider.provider_name.toLowerCase().includes('channel')) continue;
       const popularName = popularNames[provider.provider_name] || provider.provider_name;
       if (!seen.has(popularName)) {
         seen.add(popularName);
