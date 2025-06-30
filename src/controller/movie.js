@@ -6,31 +6,65 @@ const Favorite = require('../models/favorite');
 const get = async (req, res) => {
 	const { genre } = req.query;
 	const page = getRandomInt(1, 70);
-	const response = await getMovies(page, 'pt-BR', genre);
+	let response = await getMovies(page, 'pt-BR', genre);
 
 	if (!response || response.length === 0) {
 		return res.status(404).json({ error: 'Nenhum filme encontrado.' });
 	}
 
-	const movieNumber = getRandomInt(0, response.length);
-	const movie = response[movieNumber];
+	let movieWithProviders = null;
+	for (let i = 0; i < response.length; i++) {
+		const movie = response[i];
+		const { backdrop_path, title, overview, id } = movie;
+		if (!overview || overview.trim() === '') continue;
+		let providers = await getWatchProviders(id);
+		if (!providers || providers.length === 0) {
+			providers = await getWatchProviders(id);
+		}
+		if (providers && providers.length > 0) {
+			movieWithProviders = {
+				id,
+				backdrop_path: `https://image.tmdb.org/t/p/w500${backdrop_path}`,
+				title,
+				overview,
+				providers
+			};
+			break;
+		}
+	}
 
-	const {
-		backdrop_path,
-		title,
-		overview,
-		id
-	} = movie;
+	response = await getMovies(page, 'pt-BR', genre);
 
-	const providers = await getWatchProviders(id);
+	if (!response || response.length === 0) {
+		return res.status(404).json({ error: 'Nenhum filme encontrado.' });
+	}
 
-	return res.status(200).json({
-		id: id,
-		backdrop_path: `https://image.tmdb.org/t/p/w500${backdrop_path}`,
-		title,
-		overview,
-		providers
-	});
+
+	for (let i = 0; i < response.length; i++) {
+		const movie = response[i];
+		const { backdrop_path, title, overview, id } = movie;
+		if (!overview || overview.trim() === '') continue;
+		let providers = await getWatchProviders(id);
+		if (!providers || providers.length === 0) {
+			providers = await getWatchProviders(id);
+		}
+		if (providers && providers.length > 0) {
+			movieWithProviders = {
+				id,
+				backdrop_path: `https://image.tmdb.org/t/p/w500${backdrop_path}`,
+				title,
+				overview,
+				providers
+			};
+			break;
+		}
+	}
+
+	if (!movieWithProviders) {
+		return res.status(404).json({ error: 'Nenhum filme com providers encontrado.' });
+	}
+
+	return res.status(200).json(movieWithProviders);
 };
 
 const saveFavorite = async (req, res) => {
@@ -48,25 +82,25 @@ const saveFavorite = async (req, res) => {
 };
 
 const getFavorites = async (req, res) => {
-  try {
-    const favorites = await Favorite.find();
-    return res.status(200).json(favorites);
-  } catch (err) {
-    return res.status(500).json({ error: 'Erro ao buscar favoritos.' });
-  }
+	try {
+		const favorites = await Favorite.find();
+		return res.status(200).json(favorites);
+	} catch (err) {
+		return res.status(500).json({ error: 'Erro ao buscar favoritos.' });
+	}
 };
 
 const deleteFavorite = async (req, res) => {
-  try {
-    const { movieId } = req.params;
-    const result = await Favorite.deleteOne({ movieId });
-    if (result.deletedCount === 0) {
-      return res.status(404).json({ error: 'Favorito não encontrado.' });
-    }
-    return res.status(200).json({ message: 'Favorito removido com sucesso!' });
-  } catch (err) {
-    return res.status(500).json({ error: 'Erro ao remover favorito.' });
-  }
+	try {
+		const { movieId } = req.params;
+		const result = await Favorite.deleteOne({ movieId });
+		if (result.deletedCount === 0) {
+			return res.status(404).json({ error: 'Favorito não encontrado.' });
+		}
+		return res.status(200).json({ message: 'Favorito removido com sucesso!' });
+	} catch (err) {
+		return res.status(500).json({ error: 'Erro ao remover favorito.' });
+	}
 };
 
 module.exports = { get, saveFavorite, getFavorites, deleteFavorite };
