@@ -6,5 +6,6 @@ module.exports = {
 	baseURL: process.env.BASE_URL_TMDB,
 	timeout: process.env.TIMEOUT_URL_TMDB,
 	bearerToken: process.env.BEARER_TOKEN_TMDB,
-	apiKey: process.env.API_KEY_TMDB
+	apiKey: process.env.API_KEY_TMDB,
+	mongoURI: process.env.MONGODB_URI,
 };

@@ -1,16 +1,17 @@
 const axios = require('axios');
-const { baseURL, bearerToken, timeout, apiKey } = require('../../config');
+const { baseURL, bearerToken, timeout } = require('../../config');
 
 const instance = axios.create({
   baseURL: baseURL,
-  timeout: timeout,
-	'Authorization': bearerToken
+  timeout: Number(timeout),
+  headers: {
+    Authorization: `Bearer ${bearerToken}`
+  }
 });
 
 const getMovies = async (page, language, genreId) => {
   try {
     const params = {
-      api_key: apiKey,
       language,
       page,
       'release_date.gte': '2018',
@@ -19,7 +20,7 @@ const getMovies = async (page, language, genreId) => {
     if (genreId) {
       params.with_genres = genreId;
     }
-    const { data: { results } } = await instance.get(`/3/discover/movie`, { params });
+    const { data: { results } } = await instance.get('/discover/movie', { params });
     return results;
   } catch (e) {
     throw e;
